@@ -8,7 +8,7 @@ using namespace std;
 
 const string file_text = "input.txt";
 
-// Описание слова
+// ГЋГЇГЁГ±Г Г­ГЁГҐ Г±Г«Г®ГўГ 
 enum Word_type {
     SUBJECT, 
     PREDICATE,
@@ -22,43 +22,43 @@ enum Word_type {
     UNKNOWN
 };
 
-//Структура слова: само слово + тип
+//Г‘ГІГ°ГіГЄГІГіГ°Г  Г±Г«Г®ГўГ : Г±Г Г¬Г® Г±Г«Г®ГўГ® + ГІГЁГЇ
 struct Word {
     string data;
     Word_type type;
 };
 
-//Расшифровка перечисляемого типа для удобства
-//Добавлены не все типы
+//ГђГ Г±ГёГЁГґГ°Г®ГўГЄГ  ГЇГҐГ°ГҐГ·ГЁГ±Г«ГїГҐГ¬Г®ГЈГ® ГІГЁГЇГ  Г¤Г«Гї ГіГ¤Г®ГЎГ±ГІГўГ 
+//Г„Г®ГЎГ ГўГ«ГҐГ­Г» Г­ГҐ ГўГ±ГҐ ГІГЁГЇГ»
 string type_decoding(Word_type type) {
     switch (type) {
         case Word_type::SUBJECT:
-            return "Подлежащее";
+            return "ГЏГ®Г¤Г«ГҐГ¦Г Г№ГҐГҐ";
         case Word_type::PREDICATE:
-            return "Сказуемое";
+            return "Г‘ГЄГ Г§ГіГҐГ¬Г®ГҐ";
         case Word_type::ADDITION:
-            return "Дополнение";
+            return "Г„Г®ГЇГ®Г«Г­ГҐГ­ГЁГҐ";
         case Word_type::DEFINITION:
-            return "Определение";
+            return "ГЋГЇГ°ГҐГ¤ГҐГ«ГҐГ­ГЁГҐ";
         case Word_type::PUNCTUATION:
-            return "Знак препинания";
+            return "Г‡Г­Г ГЄ ГЇГ°ГҐГЇГЁГ­Г Г­ГЁГї";
         case Word_type::CIRCUMSTANCE:
-            return "Обстоятельство";
+            return "ГЋГЎГ±ГІГ®ГїГІГҐГ«ГјГ±ГІГўГ®";
         case Word_type::UNION:
-            return "Союз";
+            return "Г‘Г®ГѕГ§";
         case Word_type::PREPOSITION:
-            return "Предлог";
+            return "ГЏГ°ГҐГ¤Г«Г®ГЈ";
         case Word_type::PARTICLE:
-            return "Частица";
+            return "Г—Г Г±ГІГЁГ¶Г ";
     }
     return "Unknown";
 }
 
 
-//Предложение - вектор слов
+//ГЏГ°ГҐГ¤Г«Г®Г¦ГҐГ­ГЁГҐ - ГўГҐГЄГІГ®Г° Г±Г«Г®Гў
 vector<vector<Word>> sentences;
 
-//Тут можно будет добавить логику выбора при последовательном анализе, каким членом предложения является слово.
+//Г’ГіГІ Г¬Г®Г¦Г­Г® ГЎГіГ¤ГҐГІ Г¤Г®ГЎГ ГўГЁГІГј Г«Г®ГЈГЁГЄГі ГўГ»ГЎГ®Г°Г  ГЇГ°ГЁ ГЇГ®Г±Г«ГҐГ¤Г®ГўГ ГІГҐГ«ГјГ­Г®Г¬ Г Г­Г Г«ГЁГ§ГҐ, ГЄГ ГЄГЁГ¬ Г·Г«ГҐГ­Г®Г¬ ГЇГ°ГҐГ¤Г«Г®Г¦ГҐГ­ГЁГї ГїГўГ«ГїГҐГІГ±Гї Г±Г«Г®ГўГ®.
 //
 Word_type getWord_type(const string& current_word) {
     
@@ -70,15 +70,22 @@ void separation_sentence()
     string line;
     while (getline(file, line)) 
    {
-        // Поиск позиции escape последовательности 
+        // ГЏГ®ГЁГ±ГЄ ГЇГ®Г§ГЁГ¶ГЁГЁ escape ГЇГ®Г±Г«ГҐГ¤Г®ГўГ ГІГҐГ«ГјГ­Г®Г±ГІГЁ 
         size_t pos = line.find("\n");
 
-        // Если escape последовательность найдена, обрезаем строку до этой позиции
+        // Г…Г±Г«ГЁ escape ГЇГ®Г±Г«ГҐГ¤Г®ГўГ ГІГҐГ«ГјГ­Г®Г±ГІГј Г­Г Г©Г¤ГҐГ­Г , Г®ГЎГ°ГҐГ§Г ГҐГ¬ Г±ГІГ°Г®ГЄГі Г¤Г® ГЅГІГ®Г© ГЇГ®Г§ГЁГ¶ГЁГЁ
         if (pos != string::npos) {
             line = line.substr(0, pos);
         }
-
-        // Разделение строки на слова
+        // Р•СЃР»Рё СЃС‚СЂРѕРєР° РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ С‡РёСЃР»Р° + ")" (Р·Р°РєСЂС‹РІР°СЋС‰Р°СЏ СЃРєРѕР±РєР°),
+        // С‚Рѕ РїСЂРѕРїСѓСЃРєР°РµРј СЌС‚Сѓ РЅСѓРјРµСЂР°С†РёСЋ.
+         if (!line.empty()) {
+            size_t index_pos = line.find_first_of(") ");
+            if (index_pos != string::npos && index_pos != 0 && isdigit(line[index_pos - 1])) {
+                line = line.substr(index_pos + 1);
+            }
+        }
+        // ГђГ Г§Г¤ГҐГ«ГҐГ­ГЁГҐ Г±ГІГ°Г®ГЄГЁ Г­Г  Г±Г«Г®ГўГ 
         string current_word;
         vector<Word> words;
         for (size_t i = 0; i < line.size(); ++i) 
@@ -86,24 +93,24 @@ void separation_sentence()
             char check = line[i];
             if (isspace(check) || ispunct(check)) 
             {
-                // Если текущий символ является пробелом или знаком пунктуации,
-                // сохраняем собранное слово в вектор слов
+                // Г…Г±Г«ГЁ ГІГҐГЄГіГ№ГЁГ© Г±ГЁГ¬ГўГ®Г« ГїГўГ«ГїГҐГІГ±Гї ГЇГ°Г®ГЎГҐГ«Г®Г¬ ГЁГ«ГЁ Г§Г­Г ГЄГ®Г¬ ГЇГіГ­ГЄГІГіГ Г¶ГЁГЁ,
+                // Г±Г®ГµГ°Г Г­ГїГҐГ¬ Г±Г®ГЎГ°Г Г­Г­Г®ГҐ Г±Г«Г®ГўГ® Гў ГўГҐГЄГІГ®Г° Г±Г«Г®Гў
                 if (!current_word.empty()) 
                 {
                     words.push_back({current_word, UNKNOWN});
                     current_word.clear();
                 }
-                // Если текущий символ является знаком пунктуации, добавляем его как отдельное слово
+                // Г…Г±Г«ГЁ ГІГҐГЄГіГ№ГЁГ© Г±ГЁГ¬ГўГ®Г« ГїГўГ«ГїГҐГІГ±Гї Г§Г­Г ГЄГ®Г¬ ГЇГіГ­ГЄГІГіГ Г¶ГЁГЁ, Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ ГҐГЈГ® ГЄГ ГЄ Г®ГІГ¤ГҐГ«ГјГ­Г®ГҐ Г±Г«Г®ГўГ®
                 if (ispunct(check)) {
                     string punctuations(1, check);
                     words.push_back({punctuations, PUNCTUATION});
                 }
             } else {
-                // Добавляем текущий символ к текущему слову
+                // Г„Г®ГЎГ ГўГ«ГїГҐГ¬ ГІГҐГЄГіГ№ГЁГ© Г±ГЁГ¬ГўГ®Г« ГЄ ГІГҐГЄГіГ№ГҐГ¬Гі Г±Г«Г®ГўГі
                 current_word += check;
             }
         }
-        // Проверяем, есть ли оставшееся слово в строке и добавляем его, если есть
+        // ГЏГ°Г®ГўГҐГ°ГїГҐГ¬, ГҐГ±ГІГј Г«ГЁ Г®Г±ГІГ ГўГёГҐГҐГ±Гї Г±Г«Г®ГўГ® Гў Г±ГІГ°Г®ГЄГҐ ГЁ Г¤Г®ГЎГ ГўГ«ГїГҐГ¬ ГҐГЈГ®, ГҐГ±Г«ГЁ ГҐГ±ГІГј
         if (!current_word.empty()) {
             Word_type type = getWord_type(current_word);
             words.push_back({current_word, type});
@@ -121,13 +128,13 @@ int main() {
 
     separation_sentence();
     
-    //Вывод предложений
+    //Г‚Г»ГўГ®Г¤ ГЇГ°ГҐГ¤Г«Г®Г¦ГҐГ­ГЁГ©
     for (size_t i = 0; i < sentences.size(); ++i) {
-        cout << "Предложение " << i + 1 << ":" << endl;
+        cout << "ГЏГ°ГҐГ¤Г«Г®Г¦ГҐГ­ГЁГҐ " << i + 1 << ":" << endl;
         const vector<Word>& sentence = sentences[i];
         for (size_t j = 0; j < sentence.size(); ++j) {
             const Word& word = sentence[j];
-            cout << "Слово: " << word.data << " - Тип: " <<type_decoding(word.type)<< endl;
+            cout << "Г‘Г«Г®ГўГ®: " << word.data << " - Г’ГЁГЇ: " <<type_decoding(word.type)<< endl;
         }
         cout << "----------" << endl;
     }
