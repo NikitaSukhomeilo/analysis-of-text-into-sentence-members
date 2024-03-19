@@ -1,16 +1,16 @@
 #include "MyForm.h"
 using namespace System;
-using namespace System::Windows::Forms; // пространство имЄн, предоставл¤ющее доступ к функци¤м работы с окнами
+using namespace System::Windows::Forms; // пространство имён, предоставляющее доступ к функциям работы с окнами
 using namespace std;
-using namespace msclr::interop; // пространство имЄн дл¤ работы преобразовател¤ строк marshal
-[STAThreadAttribute] // об¤зательное требование дл¤ обмена сообщени¤ми с сервером сообщений Windows с
+using namespace msclr::interop; // пространство имён для работы преобразователя строк marshal
+[STAThreadAttribute] // обязательное требование для обмена сообщениями с сервером сообщений Windows с
 int main(cli::array<String^> ^ arguments)
 {
-	Application::EnableVisualStyles(); // включает визуальные стили дл¤ приложени¤
-	Application::SetCompatibleTextRenderingDefault(false); // задаЄт по умолчанию значени¤ дл¤ свойств
+	Application::EnableVisualStyles(); // включает визуальные стили для приложения
+	Application::SetCompatibleTextRenderingDefault(false); // задаёт по умолчанию значения для свойств
 	Project4::MyForm Page;
-	Application::Run(% Page); // запуск приложени¤
-	Application::Exit(); // завершение работы приложени¤
+	Application::Run(% Page); // запуск приложения
+	Application::Exit(); // завершение работы приложения
 	return 0;
 }
 
@@ -21,7 +21,7 @@ System::Void Project4::MyForm::SubmitButton_Click(System::Object^ sender, System
 	{
 		String^ MegaText = "";
 		MegaText = this->TextDisplay->Text; // получение всего текста из окна ввода-показа
-		whole_text = marshal_as<string>(MegaText); // преобразовани¤ текста-строки из System^ в std::string
+		whole_text = marshal_as<string>(MegaText); // преобразования текста-строки из System^ в std::string
 		// удаление символов переноса строки
 		while (whole_text.find('\n') != string::npos)
 		{
@@ -30,11 +30,11 @@ System::Void Project4::MyForm::SubmitButton_Click(System::Object^ sender, System
 	}
 	this->SubmitSuccessLabel->Visible = true;
 	main_function(whole_text); // вызов основной функции
-	this->SubmitButton->Enabled = false;
+	this->SubmitButton->Enabled = false; // посмотреть позднее
 	this->SelectSentenceMembers->Enabled = true;
 	this->ShowStatistics->Enabled = true;
 }
-String^ Project4::MyForm::get_current_directory() // получение в качестве строки String^ местоположени¤ выбранного пользователем файла
+String^ Project4::MyForm::get_current_directory() // получение в качестве строки String^ местоположения выбранного пользователем файла
 {
 	char buffer[MAX_PATH];
 	GetCurrentDirectoryA(256, buffer);
@@ -45,14 +45,14 @@ System::Void Project4::MyForm::открытьToolStripMenuItem_Click(System::Obj
 {
 	// выбрать файл и загрузить структуру
 	Stream^ stream;
-	OpenFileDialog^ Select_File = gcnew OpenFileDialog(); // открыть диалоговое окно дл¤ выбора исходного файла
-	Select_File->InitialDirectory = get_current_directory(); // установить первоначальное место открыти¤ окна дл¤
+	OpenFileDialog^ Select_File = gcnew OpenFileDialog(); // открыть диалоговое окно для выбора исходного файла
+	Select_File->InitialDirectory = get_current_directory(); // установить первоначальное место открытия окна для
 	Select_File->Filter = "txt files (*.txt)|*.txt"; // выбор только текстовых файлов
 	this->DialogResult = Select_File->ShowDialog();
 	if (this->DialogResult == System::Windows::Forms::DialogResult::OK)
 	{
 		// обработки кнопки ок при выборе файла в проводнике
-		if ((stream = Select_File->OpenFile())) // если файл открываетс¤
+		if ((stream = Select_File->OpenFile())) // если файл открывается
 		{
 			// добавить ветвление по типу ричтекстбокстстримтайп в зависимости от rtf и txt
 			this->TextDisplay->LoadFile(Select_File->FileName, System::Windows::Forms::RichTextBoxStreamType::PlainText);
@@ -71,60 +71,84 @@ System::Void Project4::MyForm::ShowStatistics_Click(System::Object^ sender, Syst
 	TextDisplay->Clear();
 	if (SelectSentenceMembers->CheckedItems->Count == false) // защита от
 	{
-		MessageBox::Show("¬ыберите элемент из списка!", "", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+		MessageBox::Show("Выберите элемент из списка!", "", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 	}
 	else
 	{
-		// здесь необходимы пока —”ў≈—“¬≈ЌЌџ≈ доработки
-		int lines_counter = 0; // счЄтчик строк окна
+		// здесь необходимы пока СУЩЕСТВЕННЫЕ доработки
+		int lines_counter = 0; // счётчик строк окна
 		this->TextDisplay->Clear();
-		for (auto& sentence : sentences) // итераци¤ по предложени¤м
+		int TextDisplayPosition = 0; // счётчик символов в окне ввода-вывода
+		for (auto& sentence : sentences) // итерация по предложениям
 		{
-			for (auto& word : sentence) // итераци¤ по предложению
+			bool flag = false; // показатель установки пробела перед словом
+			for (auto& word : sentence) // итерация по предложению
 			{
-				String^ line = marshal_as<String^>(word.data) + " "; // преобразование в String^ строки std::string структуры
+				String^ line = marshal_as<String^>(word.data); // преобразование в String^ строки std::string структуры
+				// переназначить цвета?
+				switch (word.type)
+				{
+				case SUBJECT: // подлежащее
+					if (this->SelectSentenceMembers->GetItemChecked(0)) // если выбрана опция показать подлежащие
+					{
+						TextDisplay->SelectionColor = Color::Red;
+					}
+					break;
+				case PREDICATE:
+					if (this->SelectSentenceMembers->GetItemChecked(1)) // если выбрана опция показать сказуемое
+					{
+						TextDisplay->SelectionColor = Color::Blue;
+					}
+					break;
+				case ADDITION:
+					if (this->SelectSentenceMembers->GetItemChecked(2))
+					{
+						TextDisplay->SelectionColor = Color::Violet;
+					}
+					break;
+				case DEFINITION:
+					if (this->SelectSentenceMembers->GetItemChecked(4))
+					{
+						TextDisplay->SelectionColor = Color::Green;
+					}
+					break;
+				case PUNCTUATION:
+					if (this->SelectSentenceMembers->GetItemChecked(5))
+					{
+						TextDisplay->SelectionColor = Color::Pink;
+					}
+					break;
+				default:
+					TextDisplay->SelectionColor = Color::Black;
+					break;
+				}
+				if ((word.type != PUNCTUATION) && (flag != false)) // если слово не является первым в предложении и не является знаком пунктуации
+				{
+					TextDisplay->AppendText(" ");
+					TextDisplayPosition++;
+				}
+				else
+				{
+					flag = true; // разрешить постановку пробела
+				}
+				TextDisplay->Select(TextDisplayPosition, 0); // выбор одного символа для формата цвета по образцу
 				TextDisplay->AppendText(line); // запись слова в строку окна ввода-вывода
-				int startPosition = this->TextDisplay->Lines[lines_counter]->Length - 2; // определение позиции в строке окна ввода-вывода начала слова
-				TextDisplay->Select(startPosition, line->Length); // выделение слова
-				// далее ¤ случайным образом назначил цвета
-				if (word.type == 0 && this->SelectSentenceMembers->GetItemChecked(0))
-				{
-					TextDisplay->SelectionColor = Color::Red;
-				}
-				if (word.type == 1 && this->SelectSentenceMembers->GetItemChecked(1))
-				{
-					TextDisplay->SelectionColor = Color::Blue;
-				}
-				if (word.type == 2 && this->SelectSentenceMembers->GetItemChecked(2))
-				{
-					TextDisplay->SelectionColor = Color::Violet;
-				}
-				if (word.type == 3 && this->SelectSentenceMembers->GetItemChecked(3))
-				{
-					TextDisplay->SelectionColor = Color::Green;
-				}
-				if (word.type == 4 && this->SelectSentenceMembers->GetItemChecked(5))
-				{
-					TextDisplay->SelectionColor = Color::Pink;
-				}
-				// =================
-				int s = this->TextDisplay->Lines[lines_counter]->Length - 1;
-				TextDisplay->Select(s, 1); // выбор пробела за словом
-				TextDisplay->SelectionColor = Color::Black; // установка черного цвета
+				TextDisplayPosition += line->Length; // увеличение счётчика символов в окне ввода-вывода
 			}
 			TextDisplay->AppendText("\n"); // переход на следующую строку окна
-			lines_counter++; // увеличение счЄтчика строк окна
+			TextDisplayPosition++;
+			lines_counter++; // увеличение счётчика строк окна
 		}
 	}
 }
 
 System::Void Project4::MyForm::создатьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e)
 {
-	if (sentences.size() != false) // если до этого анализировалс¤ текст
+	if (sentences.size() != false) // если до этого анализировался текст
 	{
 		sentences.clear(); // очистка вектора структур слов
 	}
-	if (SelectSentenceMembers->CheckedItems->Count) // если до этого был выбор вывода членов предложени¤
+	if (SelectSentenceMembers->CheckedItems->Count) // если до этого был выбор вывода членов предложения
 	{
 		SelectSentenceMembers->ClearSelected(); // очистка выбора
 	}
@@ -132,6 +156,7 @@ System::Void Project4::MyForm::создатьToolStripMenuItem_Click(System::Obj
 	{
 		TextDisplay->Clear(); // очистка окна
 	}
+	SubmitButton->Enabled = true;
 }
 
 System::Void Project4::MyForm::сохранитьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e)
