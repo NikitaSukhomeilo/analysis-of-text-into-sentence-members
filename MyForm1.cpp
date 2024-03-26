@@ -8,14 +8,90 @@ System::Void Project4::MyForm1::CloseButton_Click(System::Object^ sender, System
 
 System::Void Project4::MyForm1::ShowSubject_Click(System::Object^ sender, System::EventArgs^ e)
 {
+    int counter = 0;
     for (const auto& sentence : sentences)
     {
         for (const auto& word : sentence)
         {
             if (word.type == SUBJECT)
             {
-               // this->Screen->Rows->Add(word.data.c_str());
+                this->Screen->Rows->Add();
+                this->Screen->Rows[counter]->Cells[0]->Value = marshal_as<String^>(word.data);
+                this->Screen->Rows[counter]->Cells[1]->Value = word.frequency;
+                this->Screen->Rows[counter++]->Cells[2]->Value = marshal_as<String^>(word.sentences_included);
             }
         }
    }
+}
+
+System::Void Project4::MyForm1::ShowPredicate_Click(System::Object^ sender, System::EventArgs^ e)
+{
+    int counter = 0;
+    for (const auto& sentence : sentences)
+    {
+        for (const auto& word : sentence)
+        {
+            if (word.type == PREDICATE)
+            {
+                this->Screen->Rows->Add();
+                this->Screen->Rows[counter]->Cells[0]->Value = marshal_as<String^>(word.data);
+                this->Screen->Rows[counter]->Cells[1]->Value = word.frequency;
+                this->Screen->Rows[counter++]->Cells[2]->Value = marshal_as<String^>(word.sentences_included);
+            }
+        }
+    }
+}
+
+System::Void Project4::MyForm1::ShowAttribute_Click(System::Object^ sender, System::EventArgs^ e)
+{
+    int counter = 0;
+    for (const auto& sentence : sentences)
+    {
+        for (const auto& word : sentence)
+        {
+            if (word.type == DEFINITION)
+            {
+                this->Screen->Rows->Add();
+                this->Screen->Rows[counter]->Cells[0]->Value = marshal_as<String^>(word.data);
+                this->Screen->Rows[counter]->Cells[1]->Value = word.frequency;
+                this->Screen->Rows[counter++]->Cells[2]->Value = marshal_as<String^>(word.sentences_included);
+            }
+        }
+    }
+}
+
+System::Void Project4::MyForm1::ShowObject_Click(System::Object^ sender, System::EventArgs^ e)
+{
+    int counter = 0;
+    for (const auto& sentence : sentences)
+    {
+        for (const auto& word : sentence)
+        {
+            if (word.type == ADDITION)
+            {
+                this->Screen->Rows->Add();
+                this->Screen->Rows[counter]->Cells[0]->Value = marshal_as<String^>(word.data);
+                this->Screen->Rows[counter]->Cells[1]->Value = word.frequency;
+                this->Screen->Rows[counter++]->Cells[2]->Value = marshal_as<String^>(word.sentences_included);
+            }
+        }
+    }
+}
+
+System::Void Project4::MyForm1::ShowAdverbialModifier_Click(System::Object^ sender, System::EventArgs^ e)
+{
+    int counter = 0;
+    for (const auto& sentence : sentences)
+    {
+        for (const auto& word : sentence)
+        {
+            if (word.type == CIRCUMSTANCE)
+            {
+                this->Screen->Rows->Add();
+                this->Screen->Rows[counter]->Cells[0]->Value = marshal_as<String^>(word.data);
+                this->Screen->Rows[counter]->Cells[1]->Value = word.frequency;
+                this->Screen->Rows[counter++]->Cells[2]->Value = marshal_as<String^>(word.sentences_included);
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include"TextReader.h"
+#include<msclr\marshal_cppstd.h> // библиотека для преобразования строк типа String^ в std::string и обратно
 namespace Project4
 {
 	using namespace System;
@@ -8,7 +9,7 @@ namespace Project4
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
-
+	using namespace msclr::interop;
 	/// <summary>
 	/// Сводка для MyForm1
 	/// </summary>
@@ -144,6 +145,7 @@ namespace Project4
 			this->ShowPredicate->TabIndex = 3;
 			this->ShowPredicate->Text = L"Сказуемое";
 			this->ShowPredicate->UseVisualStyleBackColor = true;
+			this->ShowPredicate->Click += gcnew System::EventHandler(this, &MyForm1::ShowPredicate_Click);
 			// 
 			// ShowAttribute
 			// 
@@ -153,6 +155,7 @@ namespace Project4
 			this->ShowAttribute->TabIndex = 4;
 			this->ShowAttribute->Text = L"Определение";
 			this->ShowAttribute->UseVisualStyleBackColor = true;
+			this->ShowAttribute->Click += gcnew System::EventHandler(this, &MyForm1::ShowAttribute_Click);
 			// 
 			// ShowObject
 			// 
@@ -162,6 +165,7 @@ namespace Project4
 			this->ShowObject->TabIndex = 5;
 			this->ShowObject->Text = L"Дополнение";
 			this->ShowObject->UseVisualStyleBackColor = true;
+			this->ShowObject->Click += gcnew System::EventHandler(this, &MyForm1::ShowObject_Click);
 			// 
 			// ShowAdverbialModifier
 			// 
@@ -171,6 +175,7 @@ namespace Project4
 			this->ShowAdverbialModifier->TabIndex = 6;
 			this->ShowAdverbialModifier->Text = L"Обстоятельство";
 			this->ShowAdverbialModifier->UseVisualStyleBackColor = true;
+			this->ShowAdverbialModifier->Click += gcnew System::EventHandler(this, &MyForm1::ShowAdverbialModifier_Click);
 			// 
 			// vScrollBar1
 			// 
@@ -202,8 +207,12 @@ namespace Project4
 
 		}
 #pragma endregion
-	private: System::Void CloseButton_Click(System::Object^ sender, System::EventArgs^ e);
-			 System::Void ShowSubject_Click(System::Object^ sender, System::EventArgs^ e);
+	private: 
+		System::Void CloseButton_Click(System::Object^ sender, System::EventArgs^ e);
+		System::Void ShowSubject_Click(System::Object^ sender, System::EventArgs^ e);
+		System::Void ShowPredicate_Click(System::Object^ sender, System::EventArgs^ e);
+		System::Void ShowAttribute_Click(System::Object^ sender, System::EventArgs^ e);
+		System::Void ShowObject_Click(System::Object^ sender, System::EventArgs^ e);
+		System::Void ShowAdverbialModifier_Click(System::Object^ sender, System::EventArgs^ e);
 };
-
 }
