@@ -1,0 +1,117 @@
+#include"Frame.h"
+#include"Predicate.h"
+#include"addition.h"
+LPCWSTR string2LPCWSTR(const string& str) // функция преобразования строк из std::string в LPCWSTR
+{
+	wstring wsname = wstring(str.begin(), str.end()); // создать строку типа std::wstring путём конструктора с копированием std::string
+	return (wsname.c_str()); // вернуть в качестве параметра строку LPCWSTR путём копирования строки std::wstring
+}
+void split_text(string& line) // функция преобразования исходного текста в пронумерованный файл
+{
+	ofstream splitted("splitted_text.txt");
+	size_t sentence_counter = 1; // счётчик числа предложений
+	string part_of_sentence; // строка, отвечающая за хранение первой части предложения при переносе
+	string sentence; // строка, отвечающая за хранение предложения из строки копии входного файла
+	for (int i = 0; i < line.size(); i++) // итерация по строке из файла
+	{
+		sentence += line[i]; // посимвольное копирование предложения из строки
+		if (line[i] == '.' || line[i] == '?' || line[i] == '!') // если встретился символ окончания предложения
+		{
+			if ((i != line.size() - 1) && line[i + 1] != ' ') // если нет пробела после этого знака и все предложение не одно во всей строке
+			{
+				continue;
+			}
+			while (sentence[0] == ' ') // если в самом начале предложения есть лишние пробелы
+			{
+				sentence.erase(0, 1); // удаление пробелов в самом начале предложения
+			}
+			splitted << sentence_counter++ << ") " << sentence << endl; // записать в файл предложение
+			sentence.clear();
+		}
+	}
+	splitted.close(); // закрыть файловые потоки
+}
+void find_union(vector<vector<Word>>& whole_text) // функция поиска союзов в тексте
+{
+	const vector<string> unions = { "и", "да", "тоже", "также", "а", "но", "однако", "зато", "же", "или", "либо", "то", "не", "только", "если", "столько", "сколько", "как", "так", "хотя", "что", "чтобы", "будто", "когда", "пока", "едва", "если", "раз", "ибо", "дабы", "для", "хотя", "хоть", "пускай", "как", "словно","кто", "каков", "который", "куда", "откуда", "где", "почему", "зачем" };
+	for (auto& sentence : whole_text) // итерация по предложениям
+	{
+		for (auto& word : sentence) // итерация по предложению
+		{
+			string temp = word.data;
+			if (temp[0] >= -33 && temp[0] <= -64)
+			{
+				temp[0] += 32;
+			}
+
+			for (auto& it : unions)
+			{
+				if (temp == it)
+				{
+					word.type = UNION;
+				}
+			}
+		}
+	}
+}
+void find_preposition(vector<vector<Word>>& whole_text) // функция поиска предлогов в тексте
+{
+	const vector<string> prepositions = { "в", "с","к", "до", "по", "через", "после", "из-за", "за", "над", "под", "перед", "у", "через", "возле", "мимо", "около", "от", "ради", "благодаря", "ввиду", "вследствие", "для", "на", "вопреки", "несмотря", "о", "об", "обо", "про", "насчёт","вроде", "наподобие", "без" };
+	for (auto& sentence : whole_text) // итерация по предложениям
+	{
+		for (auto& word : sentence) // итерация по предложению
+		{
+			string temp = word.data;
+			if (temp[0] >= -33 && temp[0] <= -64)
+			{
+				temp[0] += 32;
+			}
+			
+			for (auto& it : prepositions)
+			{
+				if (temp == it)
+				{
+					word.type = PREPOSITION;
+				}
+			}
+		}
+	}
+}
+void find_particle(vector<vector<Word>>& whole_text) // функция поиска частиц в тексте
+{
+	const vector<string> particles = { "бы", "пусть", "пускай", "да", "давай", "давайте", "не", "ни", "вовсе", "далеко", "отнюдь"};
+	for (auto& sentence : whole_text) // итерация по предложениям
+	{
+		for (auto& word : sentence) // итерация по предложению
+		{
+			string temp = word.data;
+			if (temp[0] >= -33 && temp[0] <= -64)
+			{
+				temp[0] += 32;
+			}
+
+			for (auto& it : particles)
+			{
+				if (temp == it)
+				{
+					word.type = PARTICLE;
+				}
+			}
+		}
+	}
+}
+void filter(vector<vector<Word>>& whole_text) // функция фильтрации слов на члены предложения и части речи
+{
+	find_union(sentences);
+	find_preposition(sentences);
+	find_particle(sentences);
+	find_predicate(sentences);
+	find_addition(sentences);
+}
+void main_function(string& whole_text)
+{
+	split_text(whole_text); // разделение изначального текста на формат: [номер предложения; правая круглая скобка; пробел; само предложение]
+	text_handler(); // формирование вектора векторов структур слов и выставка знаков препинания
+	filter(sentences); // фильтрация слов на члены предложения
+	// функция, осуществляющая подсчет уникальных слов и выставку номеров предложений, где они есть
+}
