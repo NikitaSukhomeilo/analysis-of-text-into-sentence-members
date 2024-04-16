@@ -1,6 +1,8 @@
-#include"Frame.h"
-#include"Predicate.h"
-#include"addition.h"
+#include"Frame.hpp"
+#include"Predicate.hpp"
+#include"addition.hpp"
+#include"trpo_podl.hpp"
+#include"definition.hpp"
 LPCWSTR string2LPCWSTR(const string& str) // функция преобразования строк из std::string в LPCWSTR
 {
 	wstring wsname = wstring(str.begin(), str.end()); // создать строку типа std::wstring путём конструктора с копированием std::string
@@ -39,10 +41,10 @@ void find_union(vector<vector<Word>>& whole_text) // функция поиска
 		for (auto& word : sentence) // итерация по предложению
 		{
 			string temp = word.data;
-			if (temp[0] >= -33 && temp[0] <= -64)
+			/*if (temp[0] >= -33 && temp[0] <= -64)
 			{
 				temp[0] += 32;
-			}
+			}*/
 
 			for (auto& it : unions)
 			{
@@ -102,11 +104,14 @@ void find_particle(vector<vector<Word>>& whole_text) // функция поис�
 }
 void filter(vector<vector<Word>>& whole_text) // функция фильтрации слов на члены предложения и части речи
 {
-	find_union(sentences);
-	find_preposition(sentences);
-	find_particle(sentences);
-	find_predicate(sentences);
-	find_addition(sentences);
+	find_union(sentences); // поиск союзов
+	find_preposition(sentences); // поиск предлогов
+	find_particle(sentences); // поиск частиц
+	find_definitions(); // поиск определений
+	find_predicate(); // поиск сказуемых
+	find_subjects(); // поиск подлежащих
+	find_circumstances(); // поиск обстоятельств
+	find_addition(); // поиск дополнений
 }
 void main_function(string& whole_text)
 {
