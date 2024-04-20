@@ -1,4 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "MyForm.h"
+#include"divide.hpp"
 using namespace System;
 using namespace System::Windows::Forms; // пространство имён, предоставляющее доступ к функциям работы с окнами
 using namespace std;
@@ -9,7 +11,9 @@ int main(cli::array<String^> ^ arguments)
 	Application::EnableVisualStyles(); // включает визуальные стили для приложения
 	Application::SetCompatibleTextRenderingDefault(false); // задаёт по умолчанию значения для свойств
 	Project4::MyForm Page;
+
 	Application::Run(% Page); // запуск приложения
+
 	Application::Exit(); // завершение работы приложения
 	return 0;
 }
@@ -28,12 +32,10 @@ System::Void Project4::MyForm::SubmitButton_Click(System::Object^ sender, System
 			whole_text.replace(whole_text.find('\n'), 1, 1, ' ');
 		}
 	}
-	this->SubmitSuccessLabel->Visible = true;
 	main_function(whole_text); // вызов основной функции
-	//this->SubmitButton->Enabled = false; // посмотреть позднее
-	//this->SelectSentenceMembers->Enabled = true;
-	//this->ShowStatistics->Enabled = true;
-	//this->TableButton->Enabled = true;
+	// разрешение выбора кнопок
+	this->SelectSentenceMembers->Enabled = true;
+	this->TableButton->Enabled = true;
 }
 String^ Project4::MyForm::get_current_directory() // получение в качестве строки String^ местоположения выбранного пользователем файла
 {
@@ -67,10 +69,10 @@ System::Void Project4::MyForm::открытьToolStripMenuItem_Click(System::Obj
 	delete Select_File;
 }
 
-System::Void Project4::MyForm::ShowStatistics_Click(System::Object^ sender, System::EventArgs^ e)
+System::Void Project4::MyForm::ShowInTextByColour_Click(System::Object^ sender, System::EventArgs^ e)
 {
 	TextDisplay->Clear();
-	if (SelectSentenceMembers->CheckedItems->Count == false) // защита от
+	if (SelectSentenceMembers->CheckedItems->Count == false) // вывод диагностического сообщения при попытке отображения цветом членов предложения без конкретного выбора
 	{
 		MessageBox::Show("Выберите элемент из списка!", "", MessageBoxButtons::OK, MessageBoxIcon::Warning);
 	}
@@ -89,57 +91,66 @@ System::Void Project4::MyForm::ShowStatistics_Click(System::Object^ sender, Syst
 				switch (word.type)
 				{
 				case SUBJECT: // подлежащее
+				{
 					if (this->SelectSentenceMembers->GetItemChecked(0)) // если выбрана опция показать подлежащие
 					{
 						TextDisplay->SelectionColor = Color::Red;
 					}
+					else
+					{
+						TextDisplay->SelectionColor = Color::Black;
+					}
 					break;
-				case PREDICATE:
+				}
+				case PREDICATE: 
+				{
 					if (this->SelectSentenceMembers->GetItemChecked(1)) // если выбрана опция показать сказуемое
 					{
 						TextDisplay->SelectionColor = Color::Blue;
 					}
-					break;
-				case ADDITION:
-					if (this->SelectSentenceMembers->GetItemChecked(2)) // если выбрана опция показать дополнение
+					else
 					{
-						TextDisplay->SelectionColor = Color::Violet;
+						TextDisplay->SelectionColor = Color::Black;
 					}
 					break;
+				}
 				case DEFINITION:
-					if (this->SelectSentenceMembers->GetItemChecked(4))
+				{
+					if (this->SelectSentenceMembers->GetItemChecked(2))
 					{
 						TextDisplay->SelectionColor = Color::Green;
 					}
-					break;
-				case PUNCTUATION:
-					if (this->SelectSentenceMembers->GetItemChecked(5))
+					else
 					{
-						TextDisplay->SelectionColor = Color::Pink;
+						TextDisplay->SelectionColor = Color::Black;
 					}
 					break;
+				}
+				case CIRCUMSTANCE:
+				{
+					if (this->SelectSentenceMembers->GetItemChecked(3))
+					{
+						TextDisplay->SelectionColor = Color::DarkOrange;
+					}
+					else
+					{
+						TextDisplay->SelectionColor = Color::Black;
+					}
+				}
+				case ADDITION:
+				{
+					if (this->SelectSentenceMembers->GetItemChecked(4)) // если выбрана опция показать дополнение
+					{
+						TextDisplay->SelectionColor = Color::Violet;
+					}
+					else
+					{
+						TextDisplay->SelectionColor = Color::Black;
+					}
+					break;
+				}
 				default:
 					TextDisplay->SelectionColor = Color::Black;
-					if (!true)
-					{
-						switch (count++%4)
-						{
-						case 0:
-							TextDisplay->SelectionColor = Color::Red;
-							break;
-						case 1:
-							TextDisplay->SelectionColor = Color::Blue;
-							break;
-						case 2:
-							TextDisplay->SelectionColor = Color::Violet;
-							break;
-						case 3:
-							TextDisplay->SelectionColor = Color::Green;
-							break;
-						default:
-							break;
-						}
-					}
 					break;
 				}
 				if ((word.type != PUNCTUATION) && (flag != false)) // если слово не является первым в предложении и не является знаком пунктуации
@@ -176,12 +187,57 @@ System::Void Project4::MyForm::создатьToolStripMenuItem_Click(System::Obj
 	{
 		TextDisplay->Clear(); // очистка окна
 	}
-	this->SubmitSuccessLabel->Visible = false;
+	if (unique_words.size() != false) // если вектор уникальных слов непустой
+	{
+		unique_words.clear(); // очистить его
+	}
+	// скрытие кнопок
+	this->SelectSentenceMembers->Enabled = false;
+	this->TableButton->Enabled = false;
+	// очистка выбора отображения
+	for (int i = 0; i < this->SelectSentenceMembers->Items->Count; i++)
+	{
+		this->SelectSentenceMembers->SetSelected(i, false);
+		this->SelectSentenceMembers->SetItemChecked(i, false);
+	}
 }
-
+string wordtype_int_to_string(const int& need_i)
+{
+	//переработка выдачи типа словами под вектор уникальных слов 
+	switch (need_i)
+	{
+	case 0:return "Подлежащее";
+	case 1:return "Сказуемое";
+	case 2:return "Определение";
+	case 3:return "Дополнение";
+	case 4:return "Обстоятельство";
+	default:return "Не определено";
+	}
+}
+void write_to_file(ofstream& writing_filestream) // функция записи в выходной файл результатов анализа текста
+{
+	for (const auto& word : unique_words) // итерация по массиву уникальных слов
+	{
+		if (word.type != PUNCTUATION)
+		{
+			writing_filestream << "data: " << word.data << setw(30 - word.data.length()) << " type: " << wordtype_int_to_string(word.type) << setw(32 - wordtype_int_to_string(word.type).length()) << " frequency: " << word.frequency << setw(30) << " sentences_included: " << word.sentences_included << endl;
+		}
+	}
+}
 System::Void Project4::MyForm::сохранитьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e)
 {
-	// здесь будет сохранение векторов структур слов в форматированном виде в файл
+	if (unique_words.size()) // если массив уникальных слов сформирован
+	{
+		string filename = "Results_";
+		filename = form_filename(filename);
+		ofstream writing_filestream(filename);
+		write_to_file(writing_filestream); // записать в файл поля элементов массива уникальных элементов
+		writing_filestream.close();
+	}
+	else
+	{
+		MessageBox::Show("Сохранять нечего!", "", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+	}
 }
 
 System::Void Project4::MyForm::TableButton_Click(System::Object^ sender, System::EventArgs^ e)
@@ -189,4 +245,9 @@ System::Void Project4::MyForm::TableButton_Click(System::Object^ sender, System:
 	MyForm1^ next_page = gcnew MyForm1(this);
 	this->Hide();
 	next_page->Show();
+}
+
+System::Void Project4::MyForm::SelectSentenceMembers_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e)
+{
+	this->ShowInTextByColour->Enabled = true;
 }

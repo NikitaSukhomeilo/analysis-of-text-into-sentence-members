@@ -5,7 +5,7 @@
 #include<exception>
 #include<Windows.h>
 #include<msclr\marshal_cppstd.h> // библиотека для преобразования строк типа String^ в std::string и обратно
-#include"Frame.h"
+#include"Frame.hpp"
 #include"MyForm1.h"
 namespace Project4 
 {
@@ -24,11 +24,13 @@ namespace Project4
 		MyForm(void) // конструктор окна формы
 		{
 			InitializeComponent();
+			LoadLibs(); // Это запускаем в начале
 		}
 		~MyForm() // деструктор окна формы
 		{
 			if (components)
 			{
+				UnloadLibs(); // Это запускаем в конце
 				delete components;
 			}
 		}
@@ -39,9 +41,10 @@ namespace Project4
 	private: System::Windows::Forms::ToolStripMenuItem^ сохранитьToolStripMenuItem;
 	private: System::Windows::Forms::RichTextBox^ TextDisplay;
 	private: System::Windows::Forms::Button^ SubmitButton;
-	private: System::Windows::Forms::Label^ SubmitSuccessLabel;
+
 	private: System::Windows::Forms::CheckedListBox^ SelectSentenceMembers;
-	private: System::Windows::Forms::Button^ ShowStatistics;
+	private: System::Windows::Forms::Button^ ShowInTextByColour;
+
 	private: System::Windows::Forms::Button^ TableButton;
 
 
@@ -65,9 +68,8 @@ namespace Project4
 			this->сохранитьToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->TextDisplay = (gcnew System::Windows::Forms::RichTextBox());
 			this->SubmitButton = (gcnew System::Windows::Forms::Button());
-			this->SubmitSuccessLabel = (gcnew System::Windows::Forms::Label());
 			this->SelectSentenceMembers = (gcnew System::Windows::Forms::CheckedListBox());
-			this->ShowStatistics = (gcnew System::Windows::Forms::Button());
+			this->ShowInTextByColour = (gcnew System::Windows::Forms::Button());
 			this->TableButton = (gcnew System::Windows::Forms::Button());
 			this->menuStrip1->SuspendLayout();
 			this->SuspendLayout();
@@ -133,45 +135,36 @@ namespace Project4
 			this->SubmitButton->UseVisualStyleBackColor = true;
 			this->SubmitButton->Click += gcnew System::EventHandler(this, &MyForm::SubmitButton_Click);
 			// 
-			// SubmitSuccessLabel
-			// 
-			this->SubmitSuccessLabel->AutoSize = true;
-			this->SubmitSuccessLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 16.2F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(204)));
-			this->SubmitSuccessLabel->ForeColor = System::Drawing::Color::Green;
-			this->SubmitSuccessLabel->Location = System::Drawing::Point(377, 559);
-			this->SubmitSuccessLabel->Name = L"SubmitSuccessLabel";
-			this->SubmitSuccessLabel->Size = System::Drawing::Size(163, 32);
-			this->SubmitSuccessLabel->TabIndex = 3;
-			this->SubmitSuccessLabel->Text = L"загружено";
-			this->SubmitSuccessLabel->Visible = false;
-			// 
 			// SelectSentenceMembers
 			// 
 			this->SelectSentenceMembers->CheckOnClick = true;
+			this->SelectSentenceMembers->Enabled = false;
 			this->SelectSentenceMembers->FormattingEnabled = true;
 			this->SelectSentenceMembers->Items->AddRange(gcnew cli::array< System::Object^  >(6) {
 				L"Подлежащее", L"Сказуемое", L"Определение",
 					L"Обстоятельство", L"Дополнение", L"Слова, не являющиеся членами предложения"
 			});
-			this->SelectSentenceMembers->Location = System::Drawing::Point(39, 156);
+			this->SelectSentenceMembers->Location = System::Drawing::Point(39, 370);
 			this->SelectSentenceMembers->Name = L"SelectSentenceMembers";
-			this->SelectSentenceMembers->Size = System::Drawing::Size(338, 140);
+			this->SelectSentenceMembers->Size = System::Drawing::Size(338, 174);
 			this->SelectSentenceMembers->TabIndex = 4;
+			this->SelectSentenceMembers->SelectedIndexChanged += gcnew System::EventHandler(this, &MyForm::SelectSentenceMembers_SelectedIndexChanged);
 			// 
-			// ShowStatistics
+			// ShowInTextByColour
 			// 
-			this->ShowStatistics->Location = System::Drawing::Point(182, 302);
-			this->ShowStatistics->Name = L"ShowStatistics";
-			this->ShowStatistics->Size = System::Drawing::Size(195, 38);
-			this->ShowStatistics->TabIndex = 5;
-			this->ShowStatistics->Text = L"Показать";
-			this->ShowStatistics->UseVisualStyleBackColor = true;
-			this->ShowStatistics->Click += gcnew System::EventHandler(this, &MyForm::ShowStatistics_Click);
+			this->ShowInTextByColour->Enabled = false;
+			this->ShowInTextByColour->Location = System::Drawing::Point(39, 550);
+			this->ShowInTextByColour->Name = L"ShowInTextByColour";
+			this->ShowInTextByColour->Size = System::Drawing::Size(195, 38);
+			this->ShowInTextByColour->TabIndex = 5;
+			this->ShowInTextByColour->Text = L"Показать";
+			this->ShowInTextByColour->UseVisualStyleBackColor = true;
+			this->ShowInTextByColour->Click += gcnew System::EventHandler(this, &MyForm::ShowInTextByColour_Click);
 			// 
 			// TableButton
 			// 
-			this->TableButton->Location = System::Drawing::Point(87, 439);
+			this->TableButton->Enabled = false;
+			this->TableButton->Location = System::Drawing::Point(39, 606);
 			this->TableButton->Name = L"TableButton";
 			this->TableButton->Size = System::Drawing::Size(195, 38);
 			this->TableButton->TabIndex = 6;
@@ -184,9 +177,8 @@ namespace Project4
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::None;
 			this->ClientSize = System::Drawing::Size(1262, 673);
 			this->Controls->Add(this->TableButton);
-			this->Controls->Add(this->ShowStatistics);
+			this->Controls->Add(this->ShowInTextByColour);
 			this->Controls->Add(this->SelectSentenceMembers);
-			this->Controls->Add(this->SubmitSuccessLabel);
 			this->Controls->Add(this->SubmitButton);
 			this->Controls->Add(this->TextDisplay);
 			this->Controls->Add(this->menuStrip1);
@@ -206,9 +198,10 @@ namespace Project4
 		String^ get_current_directory(); // получение текущей папки с программой
 		System::Void SubmitButton_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void открытьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e);
-		System::Void ShowStatistics_Click(System::Object^ sender, System::EventArgs^ e);
+		System::Void ShowInTextByColour_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void создатьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void сохранитьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void TableButton_Click(System::Object^ sender, System::EventArgs^ e);
+		System::Void SelectSentenceMembers_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e);
 };
 }

@@ -1,12 +1,10 @@
-#include"TextReader.h"
-
-const string file_text = "splitted_text.txt";
-
-// Описание слова
+#include"TextReader.hpp"
 
 //Расшифровка перечисляемого типа для удобства
-string type_decoding(Word_type type) {
-    switch (type) {
+string type_decoding(Word_type type)
+{
+    switch (type) 
+    {
     case Word_type::SUBJECT:
         return "Подлежащее";
     case Word_type::PREDICATE:
@@ -28,15 +26,22 @@ string type_decoding(Word_type type) {
     }
     return "Unknown";
 }
-
-//Тут можно будет добавить логику выбора при последовательном анализе, каким членом предложения является слово.
-//
-Word_type getWord_type(const string& current_word)
+string form_filename(string& filename) // формирование названия файла по системному времени
 {
-    return Word_type::UNKNOWN;
+    string h;
+    stringstream temp;
+    time_t t = std::time(nullptr);
+    tm* now = std::localtime(&t);
+    temp << now->tm_mday << '.' << (now->tm_mon + 1) << '.'
+        << (now->tm_year + 1900) << "_" << (now->tm_hour) << "." << (now->tm_min);
+    temp >> h;
+    filename += h;
+    filename += ".txt";
+    return filename;
 }
-void separation_sentence()
+void text_handler(const string& file_text)
 {
+   
     ifstream file(file_text);
     string line;
     while (getline(file, line))
@@ -93,31 +98,14 @@ void separation_sentence()
                 }
             }
         }//********************************************************************************
-        // Проверяем, есть ли оставшееся слово в строке и добавляем его, если есть
-        if (!current_word.empty()) {
-            Word_type type = getWord_type(current_word);
-            words.push_back({ current_word, type });
-        }
+        //// Проверяем, есть ли оставшееся слово в строке и добавляем его, если есть
+        //if (!current_word.empty()) {
+        //    Word_type type = wordtype_string_to_int(current_word);
+        //    words.push_back({ current_word, type });
+        //}
 
 
         sentences.push_back(words);
     }
     file.close();
-}
-void text_handler()
-{
-    separation_sentence();
-    ofstream Out("test.txt");
-    // Вывод предложений
-    int i = 0;
-    for (auto& sentence : sentences) // итерация по предложениям
-    {
-        Out << "Предложение " << i++ << ":" << endl;
-        for (auto& word : sentence) // итерация по предложению
-        {
-            Out << "Слово: " << word.data << " - Тип: " << type_decoding(word.type) << endl;
-        }
-        Out << "----------" << endl;
-    }
-    Out.close();
 }
