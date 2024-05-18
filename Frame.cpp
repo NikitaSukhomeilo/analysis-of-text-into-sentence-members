@@ -4,11 +4,6 @@
 #include"trpo_podl.hpp"
 #include"definition.hpp"
 #include"divide.hpp"
-LPCWSTR string2LPCWSTR(const string& str) // функция преобразования строк из std::string в LPCWSTR
-{
-	wstring wsname = wstring(str.begin(), str.end()); // создать строку типа std::wstring путём конструктора с копированием std::string
-	return (wsname.c_str()); // вернуть в качестве параметра строку LPCWSTR путём копирования строки std::wstring
-}
 void split_text(string& line, const string& file_text) // функция преобразования исходного текста в пронумерованный файл
 {
 	ofstream splitted(file_text);
@@ -42,10 +37,6 @@ void find_union(vector<vector<Word>>& whole_text) // функция поиска
 		for (auto& word : sentence) // итерация по предложению
 		{
 			string temp = word.data;
-			/*if (temp[0] >= -33 && temp[0] <= -64)
-			{
-				temp[0] += 32;
-			}*/
 
 			for (auto& it : unions)
 			{
@@ -59,7 +50,7 @@ void find_union(vector<vector<Word>>& whole_text) // функция поиска
 }
 void find_preposition(vector<vector<Word>>& whole_text) // функция поиска предлогов в тексте
 {
-	const vector<string> prepositions = { "в", "с","к", "до", "по", "через", "после", "из-за", "за", "над", "под", "перед", "у", "через", "возле", "мимо", "около", "от", "ради", "благодаря", "ввиду", "вследствие", "для", "на", "вопреки", "несмотря", "о", "об", "обо", "про", "насчёт","вроде", "наподобие", "без" };
+	const vector<string> prepositions = { "в","это", "с","к", "до", "по", "через", "после", "из-за", "за", "над", "под", "перед", "у", "через", "возле", "мимо", "около", "от", "ради", "благодаря", "ввиду", "вследствие", "для", "на", "вопреки", "несмотря", "о", "об", "обо", "про", "насчёт","вроде", "наподобие", "без" };
 	for (auto& sentence : whole_text) // итерация по предложениям
 	{
 		for (auto& word : sentence) // итерация по предложению
@@ -82,7 +73,7 @@ void find_preposition(vector<vector<Word>>& whole_text) // функция пои
 }
 void find_particle(vector<vector<Word>>& whole_text) // функция поиска частиц в тексте
 {
-	const vector<string> particles = { "бы", "пусть", "пускай", "да", "давай", "давайте", "не", "ни", "вовсе", "далеко", "отнюдь"};
+	const vector<string> particles = { "бы", "пусть", "пускай", "да", "давай", "давайте", "не", "ни", "вовсе", "далеко", "отнюдь", "уже"};
 	for (auto& sentence : whole_text) // итерация по предложениям
 	{
 		for (auto& word : sentence) // итерация по предложению
@@ -115,12 +106,13 @@ void filter(vector<vector<Word>>& whole_text) // функция фильтрац
 	find_circumstances(); // поиск обстоятельств
 	find_addition(); // поиск дополнений
 }
-void main_function(string& whole_text)
+string main_function(string& whole_text)
 {
-	string file_text = "SplittedText_";
+	string file_text = "Пронумерованный текст за ";
 	file_text = form_filename(file_text);
 	split_text(whole_text, file_text); // разделение изначального текста на формат: [номер предложения; правая круглая скобка; пробел; само предложение]
 	text_handler(file_text); // формирование вектора векторов структур слов и выставка знаков препинания
 	filter(sentences); // фильтрация слов на члены предложения
 	uniquify_words(); // функция, осуществляющая подсчет уникальных слов и выставку номеров предложений, где они есть
+	return file_text;
 }

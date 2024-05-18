@@ -1,5 +1,4 @@
 #include"TextReader.hpp"
-
 //Расшифровка перечисляемого типа для удобства
 string type_decoding(Word_type type)
 {
@@ -30,13 +29,12 @@ string form_filename(string& filename) // формирование назван�
 {
     string h;
     stringstream temp;
-    time_t t = std::time(nullptr);
-    tm* now = std::localtime(&t);
+    time_t t = time(nullptr);
+    tm* now = localtime(&t);
     temp << now->tm_mday << '.' << (now->tm_mon + 1) << '.'
         << (now->tm_year + 1900) << "_" << (now->tm_hour) << "." << (now->tm_min);
     temp >> h;
     filename += h;
-    filename += ".txt";
     return filename;
 }
 void text_handler(const string& file_text)
@@ -80,9 +78,7 @@ void text_handler(const string& file_text)
                 if (ispunct(check)) {
                     string punctuations(1, check);
                     words.push_back({ punctuations, PUNCTUATION });
-
-
-                } //*******************************************************************
+                }
             }
             else if (check == '-') {
                 // Если текущий символ - дефис, добавляем его к текущему слову
@@ -97,14 +93,7 @@ void text_handler(const string& file_text)
                     current_word += line[++i];
                 }
             }
-        }//********************************************************************************
-        //// Проверяем, есть ли оставшееся слово в строке и добавляем его, если есть
-        //if (!current_word.empty()) {
-        //    Word_type type = wordtype_string_to_int(current_word);
-        //    words.push_back({ current_word, type });
-        //}
-
-
+        }
         sentences.push_back(words);
     }
     file.close();

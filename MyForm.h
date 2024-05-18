@@ -46,6 +46,13 @@ namespace Project4
 	private: System::Windows::Forms::Button^ ShowInTextByColour;
 
 	private: System::Windows::Forms::Button^ TableButton;
+	private: System::Windows::Forms::Label^ label1;
+	private: System::Windows::Forms::RichTextBox^ DiagnosticsLine;
+	private: System::Windows::Forms::PictureBox^ pictureBox1;
+	private: System::Windows::Forms::Button^ AntiColour;
+
+
+
 
 
 	private:
@@ -61,6 +68,7 @@ namespace Project4
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm::typeid));
 			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
 			this->файлToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->создатьToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
@@ -71,7 +79,12 @@ namespace Project4
 			this->SelectSentenceMembers = (gcnew System::Windows::Forms::CheckedListBox());
 			this->ShowInTextByColour = (gcnew System::Windows::Forms::Button());
 			this->TableButton = (gcnew System::Windows::Forms::Button());
+			this->label1 = (gcnew System::Windows::Forms::Label());
+			this->DiagnosticsLine = (gcnew System::Windows::Forms::RichTextBox());
+			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
+			this->AntiColour = (gcnew System::Windows::Forms::Button());
 			this->menuStrip1->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// menuStrip1
@@ -119,19 +132,21 @@ namespace Project4
 			// 
 			this->TextDisplay->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 16.2F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->TextDisplay->Location = System::Drawing::Point(383, 44);
+			this->TextDisplay->Location = System::Drawing::Point(532, 44);
 			this->TextDisplay->Name = L"TextDisplay";
-			this->TextDisplay->Size = System::Drawing::Size(856, 500);
+			this->TextDisplay->Size = System::Drawing::Size(707, 566);
 			this->TextDisplay->TabIndex = 1;
 			this->TextDisplay->Text = L"";
+			this->TextDisplay->TextChanged += gcnew System::EventHandler(this, &MyForm::TextDisplay_TextChanged);
 			// 
 			// SubmitButton
 			// 
-			this->SubmitButton->Location = System::Drawing::Point(1044, 550);
+			this->SubmitButton->Enabled = false;
+			this->SubmitButton->Location = System::Drawing::Point(23, 44);
 			this->SubmitButton->Name = L"SubmitButton";
-			this->SubmitButton->Size = System::Drawing::Size(195, 38);
+			this->SubmitButton->Size = System::Drawing::Size(247, 54);
 			this->SubmitButton->TabIndex = 2;
-			this->SubmitButton->Text = L"Провести анализ";
+			this->SubmitButton->Text = L"Провести анализ текста на члены предложения";
 			this->SubmitButton->UseVisualStyleBackColor = true;
 			this->SubmitButton->Click += gcnew System::EventHandler(this, &MyForm::SubmitButton_Click);
 			// 
@@ -144,7 +159,7 @@ namespace Project4
 				L"Подлежащее", L"Сказуемое", L"Определение",
 					L"Обстоятельство", L"Дополнение", L"Слова, не являющиеся членами предложения"
 			});
-			this->SelectSentenceMembers->Location = System::Drawing::Point(39, 370);
+			this->SelectSentenceMembers->Location = System::Drawing::Point(23, 284);
 			this->SelectSentenceMembers->Name = L"SelectSentenceMembers";
 			this->SelectSentenceMembers->Size = System::Drawing::Size(338, 174);
 			this->SelectSentenceMembers->TabIndex = 4;
@@ -153,29 +168,76 @@ namespace Project4
 			// ShowInTextByColour
 			// 
 			this->ShowInTextByColour->Enabled = false;
-			this->ShowInTextByColour->Location = System::Drawing::Point(39, 550);
+			this->ShowInTextByColour->Location = System::Drawing::Point(23, 464);
 			this->ShowInTextByColour->Name = L"ShowInTextByColour";
-			this->ShowInTextByColour->Size = System::Drawing::Size(195, 38);
+			this->ShowInTextByColour->Size = System::Drawing::Size(247, 60);
 			this->ShowInTextByColour->TabIndex = 5;
-			this->ShowInTextByColour->Text = L"Показать";
+			this->ShowInTextByColour->Text = L"Выделить цветом выбранные члены предложения";
 			this->ShowInTextByColour->UseVisualStyleBackColor = true;
 			this->ShowInTextByColour->Click += gcnew System::EventHandler(this, &MyForm::ShowInTextByColour_Click);
 			// 
 			// TableButton
 			// 
 			this->TableButton->Enabled = false;
-			this->TableButton->Location = System::Drawing::Point(39, 606);
+			this->TableButton->Location = System::Drawing::Point(23, 544);
 			this->TableButton->Name = L"TableButton";
-			this->TableButton->Size = System::Drawing::Size(195, 38);
+			this->TableButton->Size = System::Drawing::Size(247, 66);
 			this->TableButton->TabIndex = 6;
-			this->TableButton->Text = L"Посмотреть статистику";
+			this->TableButton->Text = L"Посмотреть в табличном виде найденные члены предложения";
 			this->TableButton->UseVisualStyleBackColor = true;
 			this->TableButton->Click += gcnew System::EventHandler(this, &MyForm::TableButton_Click);
+			// 
+			// label1
+			// 
+			this->label1->AutoSize = true;
+			this->label1->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->label1->Location = System::Drawing::Point(20, 114);
+			this->label1->Name = L"label1";
+			this->label1->Size = System::Drawing::Size(428, 17);
+			this->label1->TabIndex = 7;
+			this->label1->Text = L"Выберите члены предложения для выделения цветом в тексте";
+			// 
+			// DiagnosticsLine
+			// 
+			this->DiagnosticsLine->BackColor = System::Drawing::SystemColors::InactiveCaptionText;
+			this->DiagnosticsLine->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(204)));
+			this->DiagnosticsLine->Location = System::Drawing::Point(23, 620);
+			this->DiagnosticsLine->Name = L"DiagnosticsLine";
+			this->DiagnosticsLine->Size = System::Drawing::Size(927, 41);
+			this->DiagnosticsLine->TabIndex = 9;
+			this->DiagnosticsLine->Text = L"";
+			// 
+			// pictureBox1
+			// 
+			this->pictureBox1->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pictureBox1.Image")));
+			this->pictureBox1->InitialImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"pictureBox1.InitialImage")));
+			this->pictureBox1->Location = System::Drawing::Point(23, 134);
+			this->pictureBox1->Name = L"pictureBox1";
+			this->pictureBox1->Size = System::Drawing::Size(186, 136);
+			this->pictureBox1->TabIndex = 10;
+			this->pictureBox1->TabStop = false;
+			// 
+			// AntiColour
+			// 
+			this->AntiColour->Enabled = false;
+			this->AntiColour->Location = System::Drawing::Point(286, 464);
+			this->AntiColour->Name = L"AntiColour";
+			this->AntiColour->Size = System::Drawing::Size(223, 60);
+			this->AntiColour->TabIndex = 11;
+			this->AntiColour->Text = L"Убрать выделение цветом";
+			this->AntiColour->UseVisualStyleBackColor = true;
+			this->AntiColour->Click += gcnew System::EventHandler(this, &MyForm::button1_Click);
 			// 
 			// MyForm
 			// 
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::None;
 			this->ClientSize = System::Drawing::Size(1262, 673);
+			this->Controls->Add(this->AntiColour);
+			this->Controls->Add(this->pictureBox1);
+			this->Controls->Add(this->DiagnosticsLine);
+			this->Controls->Add(this->label1);
 			this->Controls->Add(this->TableButton);
 			this->Controls->Add(this->ShowInTextByColour);
 			this->Controls->Add(this->SelectSentenceMembers);
@@ -189,6 +251,7 @@ namespace Project4
 			this->Text = L"MyForm";
 			this->menuStrip1->ResumeLayout(false);
 			this->menuStrip1->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -203,5 +266,7 @@ namespace Project4
 		System::Void сохранитьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void TableButton_Click(System::Object^ sender, System::EventArgs^ e);
 		System::Void SelectSentenceMembers_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e);
+		System::Void TextDisplay_TextChanged(System::Object^ sender, System::EventArgs^ e);
+		System::Void button1_Click(System::Object^ sender, System::EventArgs^ e);
 };
 }
